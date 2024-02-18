@@ -11,6 +11,7 @@ app.use(express.json());
 //   res.send("Hello Gaurav! THis is your Express server!");
 // });
 
+//call model below
 app.use("/api/auth", require("./routes/auth"));
 
 app.listen(port, () => {
