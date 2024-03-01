@@ -7,6 +7,8 @@ const { query, body, validationResult } = require("express-validator");
 var bcrypt = require("bcryptjs");
 //add jwt = token generation
 var jwt = require("jsonwebtoken");
+// Secret ID for token generation
+const JWT_SECRET = "gauravmynotex@2024";
 
 // ---------- Routes ---------------
 
@@ -30,7 +32,7 @@ router.get("/signup", (req, res) => {
   res.send("Hello this is sign up");
 });
 
-// Create a User using: POST "/api/auth/". Doesn't require Authentication
+// ROUTE 1: Create a User using: POST "/api/auth/createuser". Doesn't require Authentication
 router.post(
   "/createuser",
   [
@@ -63,7 +65,7 @@ router.post(
       user = await User.create({
         name: req.body.name,
         password: secPass,
-        email: req.body.email,
+        email: req.body.email.toLowerCase(),
       });
 
       // once created, return token
@@ -72,7 +74,7 @@ router.post(
           id: user.id,
         },
       };
-      const authToken = jwt.sign(data, secPass);
+      const authToken = jwt.sign(data, JWT_SECRET);
       res.json({ authToken: authToken });
     } catch (error) {
       console.error(error.message);
@@ -85,7 +87,7 @@ router.post(
   }
 );
 
-// Authenticate a user: POST "/api/auth/". Doesn't require Authentication
+// ROUTE 2: Authenticate a user: POST "/api/auth/login". Doesn't require Authentication
 router.post(
   "/login",
   [
@@ -100,15 +102,18 @@ router.post(
     }
 
     const { email, password } = req.body;
+    //console.log("Body Password: ", password);
     try {
-      const user = await User.findOne({ email: email });
+      const user = await User.findOne({ email: email.toLowerCase() });
+      //console.log("user object: ", user);
       if (!user) {
-        return res.status(400).json({ error: "Invalid credentials" });
+        return res.status(400).json({ error: "Invalid Email" });
       }
 
       const passwordCompare = await bcrypt.compare(password, user.password);
+      //console.log("passwordCompare: ", passwordCompare);
       if (!passwordCompare) {
-        return res.status(400).json({ error: "Invalid credentials" });
+        return res.status(400).json({ error: "Invalid Password" });
       }
 
       const data = {
@@ -116,7 +121,7 @@ router.post(
           id: user.id,
         },
       };
-      const authToken = jwt.sign(data, password);
+      const authToken = jwt.sign(data, JWT_SECRET);
       res.json({ authToken: authToken });
     } catch (error) {
       console.error(error.message);
@@ -124,5 +129,18 @@ router.post(
     }
   }
 );
+
+// ROUTE 3: Get logged in user details: POST "/api/auth/getUser". Login required
+//Middleware gets called everytime there is a request on route
+router.post("/getUser", async (req, res) => {
+  try {
+    const userId = "65e1ecb018292feb62440f64";
+    const user = await User.findById(userId).select("-password");
+    console.log(user);
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).send("Internal server error");
+  }
+});
 
 module.exports = router;

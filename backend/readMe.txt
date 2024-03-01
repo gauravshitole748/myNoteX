@@ -14,3 +14,4 @@ https://jwt.io/
     1. Red: Algorithem & token type
     2. Purple: data
     3. Blue: signiture
+    Doc: https://www.npmjs.com/package/jsonwebtoken
