@@ -91,7 +91,7 @@ router.post(
   }
 );
 
-// ROUTE 2: Authenticate a user: POST "/api/auth/login". Doesn't require Authentication
+// ROUTE 2: Authenticate a user using: POST "/api/auth/login". Doesn't require Authentication
 router.post(
   "/login",
   [
@@ -134,13 +134,13 @@ router.post(
   }
 );
 
-// ROUTE 3: Get logged in user details: POST "/api/auth/getUser". Login required
+// ROUTE 3: Get logged in user details using: POST "/api/auth/getUser". Login required
 //Middleware gets called everytime there is a request on route. We need to call next() in middleware so that next middleware gets called.
 // So in this case middleware is fetchUser and next middleware/function is async(req,res)
 router.post("/getuser", fetchUser, async (req, res) => {
   try {
     const userId = req.user.id;
-    const user = await User.findById(userId).select("-password");
+    const user = await User.findById(userId).select("-password"); //Select everything except password
     res.send(user);
     //console.log(user);
   } catch (error) {
