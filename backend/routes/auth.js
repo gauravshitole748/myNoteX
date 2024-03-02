@@ -8,7 +8,11 @@ var bcrypt = require("bcryptjs");
 //add jwt = token generation
 var jwt = require("jsonwebtoken");
 // Secret ID for token generation
-const JWT_SECRET = "gauravmynotex@2024";
+require("dotenv").config();
+const JWT_SECRET = process.env.REACT_APP_JWT_SECRET;
+//import middleware
+const fetchUser = require("../middleware/fetchUser");
+const { configDotenv } = require("dotenv");
 
 // ---------- Routes ---------------
 
@@ -131,14 +135,16 @@ router.post(
 );
 
 // ROUTE 3: Get logged in user details: POST "/api/auth/getUser". Login required
-//Middleware gets called everytime there is a request on route
-router.post("/getUser", async (req, res) => {
+//Middleware gets called everytime there is a request on route. We need to call next() in middleware so that next middleware gets called.
+// So in this case middleware is fetchUser and next middleware/function is async(req,res)
+router.post("/getuser", fetchUser, async (req, res) => {
   try {
-    const userId = "65e1ecb018292feb62440f64";
+    const userId = req.user.id;
     const user = await User.findById(userId).select("-password");
-    console.log(user);
+    res.send(user);
+    //console.log(user);
   } catch (error) {
-    console.error(error.message);
+    //console.error(error.message);
     res.status(500).send("Internal server error");
   }
 });
