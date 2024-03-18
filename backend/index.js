@@ -3,7 +3,7 @@ connectToMongo();
 
 const express = require("express");
 const app = express();
-const port = 4000;
+const port = 4001;
 
 // if you want to use req.boy, then its must to use express.json
 app.use(express.json());
